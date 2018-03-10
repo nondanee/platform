@@ -16,8 +16,8 @@ Python3 & aiohttp & MySQL & Vanilla JS
 需要装点东西
 
 ```
-sudo apt-get instal python3-pip git nginx supervisor mysql-client mysql-server
-sudo pip install pycrypto aiohttp aiomysql aiohttp_session cryptography
+sudo apt-get install python3-pip git nginx supervisor mysql-client mysql-server
+sudo pip3 install pycrypto aiohttp aiomysql aiohttp_session cryptography
 ```
 
 把源码拉下来
