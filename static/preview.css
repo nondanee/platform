@@ -1,0 +1,76 @@
+body{
+	margin:0;
+	font-family:"Microsoft Yahei";
+	background-color: #f5f5f5;
+}
+::selection {
+	color: #fff;
+	background-color: #28CC9E;
+}
+#whole{
+	position:relative;
+	width: 620px;
+	padding: 14px 24px 80px 24px;
+	margin:0 auto;
+	background-color: #ffffff;
+	margin-top: 12px;
+	margin-bottom: 12px;
+}
+#article>img{
+	display: block;
+	max-width:620px;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	margin:0 auto;
+}
+#article{
+	font-size: 18px;
+	line-height:1.8;
+	margin:0;
+	color:#555555;
+	overflow:hidden;
+	word-break:break-all;
+	margin-bottom:120px;
+}
+#title{
+	font-size: 36px;
+	font-weight:bold; 
+	word-break:break-all;
+	margin-bottom:6px;
+}
+#subtitle{
+	color: #5b5b5b;
+	font-size:24px;
+	margin-bottom:8px;
+}
+#provider{
+	font-style: italic;
+	color: #28CC9E;
+	font-size:16px;
+	margin-bottom:10px;
+}
+#delivery{
+	border-bottom: 1px dashed #ddd;
+	padding-bottom: 18px;
+	margin-bottom:24px;
+	color: #ddd;
+	font-size:14px;
+}
+#delete{
+	width: 36px;
+	height: 36px;
+	position: absolute;
+	left: 668px;
+	background-color: #28CC9E;
+	cursor: pointer;
+	border: none;
+	padding: 0;
+	outline: 0;
+	background-image: url(sad.png);
+	background-size: cover;
+}
+#delete:hover{
+	opacity: 0.8;
+}

@@ -1,0 +1,37 @@
+<meta charset="utf-8">
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Translation Platform</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href="/static/index.css" />
+</head>
+<body>
+<div id="topbar">
+	<div id="info"><div id="logo"></div><div id="name">Translation Platform</div></div>	
+</div>
+<div id="message" class="hidden"></div>
+<div id="text">
+	<form id="editor">
+		<textarea id="title" placeholder="TITLE"></textarea>
+		<input autocomplete="off" type="text" id="subtitle" placeholder="SUBTITLE">
+		<input autocomplete="off" type="text" id="provider" placeholder="FANSUB GROUP">
+		<select id="type">
+			<option>BLOG</option>
+			<option>MAGAZINE</option>
+			<option>NEWS</option>
+		</select>
+		<textarea id="article" placeholder="TEXT"></textarea>
+		<button type="button" id="submit" disabled="disabled">SUBMIT</button>
+	</form>
+</div>
+<div id="image">
+		<div id="done"></div>
+		<form id="add" role="form">
+			<input type="file" multiple accept="image/*" id="photo">
+		</form>
+	</div>
+</body>
+<script src="/upload/init"></script>
+<script src="/static/index.js"></script>
+</html>
