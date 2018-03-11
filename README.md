@@ -16,8 +16,8 @@ Python3 & aiohttp & MySQL & Vanilla JS
 需要装点东西
 
 ```
-sudo apt-get install python3-pip git nginx supervisor mysql-client mysql-server
-sudo pip3 install pycrypto aiohttp aiomysql aiohttp_session cryptography
+sudo apt-get install python3-pip git nginx supervisor letsencrypt mysql-client mysql-server
+sudo pip3 install pycrypto aiohttp aiomysql aiohttp_session bleach qiniu cryptography
 ```
 
 把源码拉下来
@@ -26,32 +26,44 @@ sudo pip3 install pycrypto aiohttp aiomysql aiohttp_session cryptography
 git clone https://github.com/nondanee/platform.git
 ```
 
-把旧数据搬过去
-
-改一下代码里的数据库配置
+把旧数据搬过去...
 
 改一下域名解析
 
 重新签个证书
 
 ```
-git clone https://github.com/certbot/certbot.git
-sudo bash certbot/certbot-auto certonly --standalone --email admin@example.com -d example.com
+sudo letsencrypt certonly --standalone --email admin@example.com -d example.com
 ```
 
-放好配置文件
+改一下 preferences 里的配置
 
 ```
-sudo ln -s /home/ubuntu/platform/nginx.conf /etc/nginx/sites-enabled/platform
-sudo ln -s /home/ubuntu/platform/supervisor.conf /etc/supervisor/conf.d/platform.conf
+[server]
+host = ???
+port = ???
+domain = ???
+
+[mysql]
+host = ???
+port = ???
+user = ???
+password = ???
+database = ???
+
+[qiniu]
+domain = ???
+access = ???
+secret = ???
+bucket = ???
 ```
 
-重载一下两个服务
+执行一下部署
 
 ```
-sudo service nginx reload
-sudo service supervisorctl reload
+sudo python3 deploy.py
 ```
+
 检查一下能否访问
 
 应该就好了

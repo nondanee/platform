@@ -1,31 +1,44 @@
+# -*- coding: utf-8 -*-
 import asyncio, aiomysql
 import re, json, random
 import os, pathlib
 import time, datetime
 import hashlib, base64
+import bleach
 from Crypto.Cipher import AES
 
-from aiohttp import web 
+from aiohttp import web
 from cryptography import fernet
 from aiohttp import web
 from aiohttp_session import setup, get_session, session_middleware
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
-
 # import logging
 
+working_directory = pathlib.Path(__file__).resolve().parents[1]
+
+import configparser
+config = configparser.ConfigParser()
+config.read(str(working_directory/"preferences"))
+
 def main():
-    host = "127.0.0.1"
-    port = 8800
+    host = config.get("server", "host")
+    port = config.getint("server", "port")
     loop = asyncio.get_event_loop()
     app = init(loop)
+
+    app["working_dir"] = str(working_directory)
+    app["photo_dir"] = str(working_directory/"photo")
+    app["server_domain"] = config.get("server", "domain")
+    app["qiniu_domain"] = config.get("qiniu", "domain")
+
     web.run_app(app, host = host, port = port)
 
 @asyncio.coroutine
 def create_pool(app):
     app['pool'] = yield from aiomysql.create_pool(
-        host = "localhost", port = 3306,
-        user = "root", password = "",
-        db = "platform", charset = "utf8mb4",
+        host = config.get("mysql", "host"), port = config.getint("mysql", "port"),
+        user = config.get("mysql", "user"), password = config.get("mysql", "password"),
+        db = config.get("mysql", "database"), charset = "utf8mb4",
         loop = app.loop,
     )
 
@@ -70,7 +83,7 @@ def upload_init(request):
     javascript_back = 'const token = "%s"'%(token)
 
     return javascript_response(javascript_back)
-            
+
 
 @asyncio.coroutine
 def upload_photo(request):
@@ -114,11 +127,11 @@ def upload_photo(request):
         if not chunk:
             break
 
-        if size == 0 : 
+        if size == 0:
 
             if len(chunk) < 4:
                 return web.HTTPUnsupportedMediaType(reason="unsupported file type")
- 
+
             # top_bytes = chunk[0:4].hex().upper()
             top_bytes = ''.join('{:02x}'.format(x) for x in chunk[0:4]).upper()
 
@@ -134,11 +147,11 @@ def upload_photo(request):
             while True:
                 temp_name = str(int(time.time())) + str(random.randint(0,9999)).zfill(4)
                 temp_path = os.path.join(photo_dir,temp_name)
-                if not os.path.exists(temp_path): 
+                if not os.path.exists(temp_path):
                     file = open(temp_path,'wb')
                     break
 
-        size = size + len(chunk)      
+        size = size + len(chunk)
         file.write(chunk)
         hash_calc.update(chunk)
 
@@ -184,17 +197,20 @@ def upload_article(request):
     data = yield from request.post()
 
     if 'title' in data:
-        title = data['title'] 
+        title = data['title']
+        title = purify_plain_text(title)
     else:
         return web.HTTPBadRequest()
     
     if 'subtitle' in data:
         subtitle = data['subtitle']
+        subtitle = purify_plain_text(subtitle)
     else:
         return web.HTTPBadRequest()
     
     if 'provider' in data:
         provider = data['provider']
+        provider = purify_plain_text(provider)
     else:
         return web.HTTPBadRequest()
 
@@ -226,13 +242,17 @@ def upload_article(request):
     article = re.sub(r'\r\n','\n',article)
     article = re.sub(r'\n','<br>',article)
     article = re.sub(r'\!\[[^\]]*\]\(([^\)]+?)\)','<img src="\g<1>">',article)
+    article = purify_article(article)
 
     photo_dir = os.path.join(request.app["photo_dir"],room)
 
     uses = []
-    for line in images: uses.append(line[0])
+    for line in images:
+        uses.append(line[0])
 
-    exists = os.listdir(photo_dir)
+    exists = []
+    if os.path.exists(photo_dir):
+        exists = os.listdir(photo_dir)
 
     if len(exists) > len(uses):
         nouses = list(set(exists).difference(set(uses)))
@@ -248,7 +268,7 @@ def upload_article(request):
             title = %s, 
             subtitle = %s, 
             provider = %s, 
-            summary = %s, 
+            snippet = %s, 
             full = %s, 
             status = %s 
             WHERE id = %s
@@ -257,7 +277,10 @@ def upload_article(request):
         yield from cursor.close()
         connect.close()
 
-    # os.system("python transcdn.py " + room + "&")
+    os.system("python3 {working_dir}/server/transmit.py {room} &".format(
+        working_dir = request.app["working_dir"],
+        room = room
+    ))
 
     if "room" not in session:
         session['room'] = room
@@ -301,6 +324,7 @@ def preview_article(request):
     provider = out[0][3]
     article = out[0][4]
     article = re.sub(r'([\d|a-f]{32}\.(jpg|png|gif))','/photo/' + room + '/\g<1>',article)
+    article = bleach.linkify(article)
 
     html_back = '''
 <!DOCTYPE html>
@@ -382,8 +406,9 @@ def article(request):
         article = re.sub(r'([\d|a-f]{32}\.(jpg|png|gif))','/photo/' + room + '/\g<1>',article)
     elif out[0][6] == 1:
         article = re.sub(r'([\d|a-f]{32}\.(jpg|png|gif))','/photo/' + room + '/\g<1>',article)
+        # article=re.sub(r'([\d|a-f]{32}\.(jpg|png|gif))','http:// + 'request.app["qiniu_domain"] + '/' + room + '/\g<1>',article)
 
-        # article=re.sub(r'([\d|a-f]{32}\.(jpg|png|gif))','http://os04l39cu.bkt.clouddn.com/' + room + '/\g<1>',article)
+    article = bleach.linkify(article)
 
     if request.match_info["type"] == "view":
 
@@ -485,9 +510,9 @@ def data_list(request):
     for line in out:
 
         if line[8] == 0:
-            article = re.sub(r'([\d|a-f]{32}\.(jpg|png|gif))','https://nogimono.tk/photo/'+line[0]+'/\g<1>',line[7])
+            article = re.sub(r'([\d|a-f]{32}\.(jpg|png|gif))','https://'+request.app["server_domain"]+'/photo/'+line[0]+'/\g<1>',line[7])
         elif line[8] == 1:
-            article = re.sub(r'([\d|a-f]{32}\.(jpg|png|gif))','http://os04l39cu.bkt.clouddn.com/'+line[0]+'/\g<1>'+"?imageView2/1/w/250/h/200/q/80",line[7])
+            article = re.sub(r'([\d|a-f]{32}\.(jpg|png|gif))','http://'+request.app["qiniu_domain"]+'/'+line[0]+'/\g<1>'+"?imageView2/1/w/250/h/200/q/80",line[7])
         
         images_raw = re.findall(r'<img src="([^"]+)">',article)
         images = list(set(images_raw))
@@ -620,6 +645,20 @@ def data_intro(request):
     else:
         return json_response(json_back)
 
+def purify_plain_text(string):
+    return bleach.clean(
+        text = string,
+        tags = [],
+        strip = True,
+    )
+
+def purify_article(string):
+    return bleach.clean(
+        text = string,
+        tags = ["img","br"],
+        attributes = {"img":["src"]}
+    )
+
 
 pad = lambda s: s + (16 - len(s) % 16) * chr(16 - len(s) % 16)
 unpad = lambda s : s[0:-(s[-1])]
@@ -706,10 +745,8 @@ def init(loop):
     app.on_startup.append(create_pool)
     setup_routes(app)
 
-    app["photo_dir"] = str(pathlib.Path(__file__).resolve().parents[1]/"photo")
-
-    # fernet_key = fernet.Fernet.generate_key()
-    fernet_key = b'wAYavr8zyR2kvmf1uXGko4MdGJ8cpDFOUW0lHIxoQ-I='
+    fernet_key = fernet.Fernet.generate_key()
+    # fernet_key = b'wAYavr8zyR2kvmf1uXGko4MdGJ8cpDFOUW0lHIxoQ-I='
     secret_key = base64.urlsafe_b64decode(fernet_key)
 
     setup(app, EncryptedCookieStorage(secret_key,max_age=43200))
