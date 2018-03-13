@@ -14,7 +14,7 @@ function unsatisfied(){
 					alert("我也不知道发生了什么")
 			}
 		}
-		xhr.open("POST","/delete/"+window.location.href.slice(-6))
+		xhr.open("POST","/delete/article")
 		xhr.send()
 	}
 }

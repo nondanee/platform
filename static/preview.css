@@ -9,16 +9,15 @@ body{
 }
 #whole{
 	position:relative;
-	width: 620px;
+	width: 600px;
+	box-sizing: border-box;
 	padding: 14px 24px 80px 24px;
-	margin:0 auto;
+	margin: 12px auto;
 	background-color: #ffffff;
-	margin-top: 12px;
-	margin-bottom: 12px;
 }
 #article>img{
 	display: block;
-	max-width:620px;
+	max-width: 100%;
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
@@ -26,37 +25,36 @@ body{
 	margin:0 auto;
 }
 #article{
-	font-size: 18px;
-	line-height:1.8;
-	margin:0;
-	color:#555555;
-	overflow:hidden;
-	word-break:break-all;
-	margin-bottom:120px;
+	font-size: 16px;
+	line-height:1.7;
+	margin: 0;
+	color: #555555;
+	overflow: hidden;
+	word-break: break-all;
+	margin-bottom: 120px;
 }
 #title{
-	font-size: 36px;
-	font-weight:bold; 
-	word-break:break-all;
-	margin-bottom:6px;
+	font-size: 32px;
+	font-weight: bold; 
+	word-break: break-all;
+	margin-bottom: 4px;
 }
 #subtitle{
 	color: #5b5b5b;
-	font-size:24px;
-	margin-bottom:8px;
+	font-size: 22px;
+	margin-bottom: 8px;
 }
 #provider{
-	font-style: italic;
 	color: #28CC9E;
-	font-size:16px;
-	margin-bottom:10px;
+	font-size: 16px;
+	margin-bottom: 6px;
 }
 #delivery{
 	border-bottom: 1px dashed #ddd;
 	padding-bottom: 18px;
 	margin-bottom:24px;
 	color: #ddd;
-	font-size:14px;
+	font-size: 14px;
 }
 #delete{
 	width: 36px;

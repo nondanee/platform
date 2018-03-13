@@ -83,6 +83,20 @@ server {{
 		alias	{working_directory}/file/$type.json;
 		add_header Content-Type 'application/json; charset=utf-8';
 	}}
+
+	### update ###
+
+	location = /check/version/android {{
+		alias	{working_directory}/update/android.json;
+		add_header Content-Type 'application/json; charset=utf-8';
+	}}
+
+	### apk ###
+
+	location /download/apk/ {{
+		alias	{working_directory}/update/;
+		# add_header Content-Type 'application/json; charset=utf-8';
+	}}
 	
 	### forward ###
 
@@ -139,5 +153,5 @@ os.system("sudo ln -s {working_directory}/nginx.conf {nginx_conf_symbolic_link}"
     nginx_conf_symbolic_link = nginx_conf_symbolic_link
 ))
 
-os.system("sudo service nginx reload")
+os.system("sudo service nginx restart")
 os.system("sudo supervisorctl reload")
