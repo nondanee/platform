@@ -1,13 +1,13 @@
 <img src="static/logo.png" alt="logo" width="128" height="128" align="right" />
 
-# NOGIMONO
+# Platform
 
-A submisson platfrom for translation of blogs and news about nogizaka46
+A submisson platform for translation of blogs and news about Nogizaka46
 
 Python3 & aiohttp & MySQL & Vanilla JS
 
 ### Deployment
-(For a new created CVM with ubuntu 16.04 on tencent cloud)
+(For a new created CVM with Ubuntu 16.04 on Tencent Cloud)
 
 Install required packages on the server
 

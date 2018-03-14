@@ -145,7 +145,8 @@ function refreshIndex(){
 	let photos = photoGallery.childNodes
 	let value = articleInput.value
 	for(let x=0;x<photos.length;x++){
-
+		
+		photos[x].childNodes[1].setAttribute("index",x+1)
 		let url_name = photos[x].value
 		let image = "!["+(x+1)+"]("+url_name+")"
 
