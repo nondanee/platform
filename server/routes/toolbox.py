@@ -30,18 +30,18 @@ def in_session(room_in_session,room):
 def add_to_session(room_in_session,room):
     rooms = set(room_in_session.split(","))
     if room in rooms:
-        return ",".join(room)
+        return ",".join(rooms)
     else:
         rooms.add(room)
-        return ",".join(room)
+        return ",".join(rooms)
 
 def remove_from_session(room_in_session,room):
     rooms = set(room_in_session.split(","))
     if room not in rooms:
-        return ",".join(room)
+        return ",".join(rooms)
     else:
         rooms.remove(room)
-        return ",".join(room)
+        return ",".join(rooms)
 
 
 pad = lambda s: s + (16 - len(s) % 16) * chr(16 - len(s) % 16)
