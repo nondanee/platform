@@ -51,6 +51,8 @@ server {{
 	ssl_ciphers 'AES128+EECDH:AES128+EDH';
 	ssl_prefer_server_ciphers on;
 
+	add_header Strict-Transport-Security "max-age=2592000; includeSubDomains" always;
+
 	if ($host != $server_name){{ return 444; }}
 
 	default_type	"";
